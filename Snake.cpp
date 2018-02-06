@@ -5,9 +5,10 @@ using namespace std;
 Snake::Snake(void)
 	:m_width(50)
 	,m_height(20)
-	,m_nTail(0)
 	,m_boundary('#')
 	,m_fruit('*')
+	,m_HeadChar('O')
+	,m_TailCHar('o')
 	,m_isGameOver(false)
 	,m_dir(STOP)
 	,m_score(0)
@@ -18,9 +19,10 @@ Snake::Snake(void)
 Snake::Snake(int width, int height)
 	: m_width(width)
 	, m_height(height)
-	,m_nTail(0)
 	,m_boundary('#')
 	,m_fruit('*')
+	,m_HeadChar('O')
+	,m_TailCHar('o')
 	, m_isGameOver(false)
 	,m_dir(STOP)
 	,m_score(0)
@@ -74,7 +76,7 @@ void Snake::draw()
 
 			if(m_headLocation == tempPoint)
 			{
-				cout << "O";
+				cout << m_HeadChar;
 			}
 			else if(m_fruitLocation == tempPoint)
 			{
@@ -83,11 +85,11 @@ void Snake::draw()
 			else
 			{
 				bool print(false);
-				for (int k(0); k < m_nTail; k++)
+				for(int k(m_v_TailPoints.size() - 1); k >=0 ; k--)
 				{
-					if (m_TailPoints[k] == tempPoint)
+					if(m_v_TailPoints[k] == tempPoint)
 					{
-						cout << "o";
+						cout << m_TailCHar;
 						print = true;
 					}
 				}
@@ -150,17 +152,19 @@ void Snake::input()
 
 void Snake::logic()
 {
-	Point previousPoint = m_TailPoints[0];
-	Point previous2Point;
-	m_TailPoints[0] = m_headLocation;
-
-	for(int itr(1); itr < m_nTail; ++itr)
+	if(m_v_TailPoints.size())
 	{
-		previous2Point = m_TailPoints[itr];
-		m_TailPoints[itr] = previousPoint;
-		previousPoint = previous2Point;
-	}
+		Point previousPoint = m_v_TailPoints[0];
+		Point previous2Point;
+		m_v_TailPoints[0] = m_headLocation;
 
+		for(int itr(1); itr < m_v_TailPoints.size(); ++itr)
+		{
+			previous2Point = m_v_TailPoints[itr];
+			m_v_TailPoints[itr] = previousPoint;
+			previousPoint = previous2Point;
+		}
+	}
 
 	switch (m_dir)
 	{
@@ -191,9 +195,9 @@ void Snake::logic()
 	if (m_headLocation.x > m_width || m_headLocation.x < 0 || m_headLocation.y > m_height || m_headLocation.y < 0)
 		m_isGameOver = true;
 
-	for(int itr(0); itr < m_nTail; ++itr)
+	for(int itr(0); itr < m_v_TailPoints.size(); ++itr)
 	{
-		if(m_headLocation == m_TailPoints[itr])
+		if(m_headLocation == m_v_TailPoints[itr])
 		{
 			m_isGameOver = true;
 			break;
@@ -202,8 +206,8 @@ void Snake::logic()
 
 	if(m_headLocation == m_fruitLocation)
 	{
+		m_v_TailPoints.push_back(m_headLocation);
 		m_score += 10;
 		updateFruitLocation();
-		m_nTail++;
 	}
 }
